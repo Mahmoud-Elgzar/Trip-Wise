@@ -187,6 +187,7 @@ class HomeScreen extends StatelessWidget {
 }*/
 
 import 'package:demo1/Booking/booking.dart';
+import 'package:demo1/ComputerVision/main.dart';
 import 'package:demo1/Translate/HomeTranslate.dart';
 import 'package:demo1/Weather/forecast.dart';
 import 'package:flutter/material.dart';
@@ -268,7 +269,14 @@ class HomeScreen extends StatelessWidget {
                         Icons.remove_red_eye,
                         const Color(0xFFA76060),
                         const Color(0xFFA76060),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const LandmarkDetectorApp()),
+                          );
+                        },
                       ),
                       _buildGradientButton(
                         context,

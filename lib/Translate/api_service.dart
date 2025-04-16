@@ -1,4 +1,3 @@
-
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
@@ -6,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   final String baseUrl = 'http://localhost:8000'; // FastAPI server URL
+  //final String baseUrl = 'https://52.23.168.88:8000'; // FastAPI server URL Deployment AWS
 
   Future<String?> translateText(
       String srcLang, String tgtLang, String text) async {

@@ -41,3 +41,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+.env
+lib/ComputerVision/backend/backend.py
+lib/ChatBot/api/api_service.dart

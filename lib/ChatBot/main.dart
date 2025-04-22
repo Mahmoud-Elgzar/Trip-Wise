@@ -14,7 +14,7 @@ void main() async {
   try {
     // Load .env file
     await dotenv.load(fileName: ".env");
-
+    
     // Initialize Hive
     await ChatProvider.initHive();
   } catch (e) {

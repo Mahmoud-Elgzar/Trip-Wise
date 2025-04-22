@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, file_names
+// ignore_for_file: library_private_types_in_public_api, file_names, deprecated_member_use
 
 import 'package:demo1/Translate/Translator_Screen.dart';
 import 'package:flutter/material.dart';

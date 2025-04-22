@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, unused_element, use_build_context_synchronously
+// ignore_for_file: file_names, unused_element, use_build_context_synchronously, avoid_print, deprecated_member_use
 
 /*import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';

@@ -17,8 +17,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # AWS credentials (replace with secure method in production)
-aws_access_key = os.getenv("AWS_ACCESS_KEY_ID", "AKIA6G75DYEK3NWC2AXH")
-aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY", "z4xEI2RI56DExIwtnbrnMAkAVLr/rPVFwz1PkeKt")
+aws_access_key = os.getenv("AWS_ACCESS_KEY_ID", "")
+aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY", "")
 region_name = "us-east-1"
 
 try:

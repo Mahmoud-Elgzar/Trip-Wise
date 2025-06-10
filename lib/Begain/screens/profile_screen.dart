@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:demo1/Begain/screens/welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String name;
+  final String email;
+  final String phone;
+
+  const ProfileScreen({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.phone,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -9,18 +20,18 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
   bool _isEditing = false;
 
   @override
   void initState() {
     super.initState();
-    // Fetch and set initial user data here (simulate with placeholders)
-    _nameController.text = "michael scott";
-    _emailController.text = "michaelscott@example.com";
-    _phoneController.text = "+1234567890";
+    // Initialize controllers with passed user data
+    _nameController = TextEditingController(text: widget.name);
+    _emailController = TextEditingController(text: widget.email);
+    _phoneController = TextEditingController(text: widget.phone);
   }
 
   void _toggleEditMode() {
@@ -34,16 +45,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _isEditing = false;
       });
-      // Save the profile information
+      // Save the profile information to SharedPreferences
+      _saveUserData();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully!')),
       );
     }
   }
 
-  void _logout() {
-    // Add logout logic here
-    Navigator.pop(context);  // Assuming it takes back to login screen
+  Future<void> _saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', _nameController.text);
+    await prefs.setString('user_email', _emailController.text);
+    await prefs.setString('user_phone', _phoneController.text);
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_name');
+    await prefs.remove('user_email');
+    await prefs.remove('user_phone');
+
+    // Navigate to WelcomeScreen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -77,13 +105,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Center(
                 child: CircleAvatar(
                   radius: 50,
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3185457252.
-                  backgroundImage:const AssetImage('assets/images/michael_scott.jpg'),
+                  backgroundImage:
+                      const AssetImage('assets/images/michael_scott.jpg'),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: _isEditing
                         ? IconButton(
-                            icon: const Icon(Icons.camera_alt, color: Colors.blue),
+                            icon: const Icon(Icons.camera_alt,
+                                color: Colors.blue),
                             onPressed: () {
                               // Handle profile picture change
                             },
@@ -154,8 +183,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ElevatedButton(
                   onPressed: _logout,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    backgroundColor: const Color(0xff356899),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
                   ),
                   child: const Text(
                     'Logout',

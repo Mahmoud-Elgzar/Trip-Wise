@@ -121,7 +121,7 @@ class _HomePageState extends State<Forecast> {
               response?.location?.name ?? "",
               style: TextStyle(
                 fontSize: screenWidth * 0.1,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
               overflow: TextOverflow.ellipsis,
@@ -143,7 +143,7 @@ class _HomePageState extends State<Forecast> {
                 style: TextStyle(
                   fontSize: screenWidth * 0.25,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               Text(
@@ -165,9 +165,9 @@ class _HomePageState extends State<Forecast> {
     return Column(
       children: [
         Text(
-          "5-Day Forecast",
+          "3-Day Forecast",
           style: TextStyle(
-            fontSize: screenWidth * 0.07,
+            fontSize: screenWidth * 0.09,
             fontWeight: FontWeight.bold,
             color: Colors.black54,
           ),

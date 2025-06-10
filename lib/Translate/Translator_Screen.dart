@@ -655,7 +655,7 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*  appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 92, 105, 127),
         title: const Row(
           children: [
@@ -675,9 +675,9 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
           ],
         ),
         centerTitle: true,
-      ),
+      ),*/
       body: Container(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(vertical: 50.0,horizontal: 22.0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFFE1D7C6), Color(0xFF295F98)],

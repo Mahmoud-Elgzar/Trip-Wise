@@ -8,10 +8,10 @@ class UserModel extends HiveObject {
   final String uid;
 
   @HiveField(1)
-  final String name;
+  late final String name;
 
   @HiveField(2)
-  final String image;
+  late final String image;
 
   // constructor
   UserModel({

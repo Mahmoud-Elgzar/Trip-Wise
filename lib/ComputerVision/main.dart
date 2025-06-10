@@ -139,9 +139,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.purpleAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFE1D7C6),
+              Color(0xFF295F98),
+            ],
+            begin: Alignment(0.9, -0.5),
+            end: Alignment(-0.9, 0.5),
           ),
         ),
         child: Center(
@@ -230,9 +233,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   }
                                 },
-                          icon: const Icon(Icons.camera_alt),
-                          label: const Text('Capture/Select Image'),
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            color: Color.fromARGB(255, 255, 255, 255),
+                          ),
+                          label: const Text(
+                            'Capture/Select Image',
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 255, 255, 255)),
+                          ),
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff356899),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(

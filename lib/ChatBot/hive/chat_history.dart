@@ -27,4 +27,8 @@ class ChatHistory extends HiveObject {
     required this.imagesUrls,
     required this.timestamp,
   });
+
+  get lastMessage => null;
+
+  get title => null;
 }

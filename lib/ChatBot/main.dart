@@ -1,10 +1,10 @@
 //import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:demo1/Chatbot/themes/my_theme.dart';
-import 'package:demo1/Chatbot/providers/chat_provider.dart';
-import 'package:demo1/Chatbot/providers/settings_provider.dart';
-import 'package:demo1/Chatbot/screens/home_screen.dart';
+import 'package:demo1/chatBot/themes/my_theme.dart';
+import 'package:demo1/chatBot/providers/chat_provider.dart';
+import 'package:demo1/chatBot/providers/settings_provider.dart';
+import 'package:demo1/chatBot/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:device_preview/device_preview.dart';
 
@@ -29,20 +29,20 @@ void main() async {
           ChangeNotifierProvider(create: (context) => ChatProvider()),
           ChangeNotifierProvider(create: (context) => SettingsProvider()),
         ],
-        child: const ChatBot(),
+        child: const cb(),
       ),
     ),
   );
 }
 
-class ChatBot extends StatefulWidget {
-  const ChatBot({super.key});
+class cb extends StatefulWidget {
+  const cb({super.key});
 
   @override
-  State<ChatBot> createState() => _ChatBotState();
+  State<cb> createState() => _cbState();
 }
 
-class _ChatBotState extends State<ChatBot> {
+class _cbState extends State<cb> {
   @override
   void initState() {
     super.initState();
@@ -67,4 +67,4 @@ class _ChatBotState extends State<ChatBot> {
       home: const HomeScreen(),
     );
   }
-}
+}*/

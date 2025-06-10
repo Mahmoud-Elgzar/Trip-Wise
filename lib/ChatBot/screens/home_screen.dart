@@ -49,13 +49,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.chat),
                   label: 'Chat',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
               ],
             ));
       },
     );
   }
 }
+
+/*import 'package:flutter/material.dart';
+import 'package:demo1/ChatBot/screens/chat_screen.dart'; // Your existing chat UI
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const ChatScreen(); // Directly show the chat interface
+  }
+}
+*/

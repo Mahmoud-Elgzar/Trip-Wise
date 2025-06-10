@@ -1,14 +1,66 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:demo1/Begain/screens/welcome_screen.dart';
 import 'package:demo1/ChatBot/hive/boxes.dart';
 import 'package:demo1/ChatBot/hive/settings.dart';
-import 'package:demo1/ChatBot/providers/settings_provider.dart';
 import 'package:demo1/ChatBot/widgets/build_diaplay_image.dart';
 import 'package:demo1/ChatBot/widgets/settings_tile.dart';
+import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class SettingsProvider with ChangeNotifier {
+  bool _shouldSpeak = false;
+  bool _isDarkMode = false;
+
+  bool get shouldSpeak => _shouldSpeak;
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleSpeak({required bool value}) {
+    _shouldSpeak = value;
+    _saveSettings();
+    notifyListeners();
+  }
+
+  void toggleDarkMode({required bool value}) {
+    _isDarkMode = value;
+    _saveSettings();
+    notifyListeners();
+  }
+
+  Future<void> loadSettings() async {
+    final box = Boxes.getSettings();
+    final settings = box.get('settings');
+    if (settings != null) {
+      _shouldSpeak = settings.shouldSpeak;
+      _isDarkMode = settings.isDarkTheme;
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveSettings() async {
+    final box = Boxes.getSettings();
+    final settings = Settings(
+      shouldSpeak: _shouldSpeak,
+      isDarkTheme: _isDarkMode,
+    );
+    await box.put('settings', settings);
+  }
+
+  void reset() {
+    _shouldSpeak = false;
+    _isDarkMode = false;
+    _saveSettings();
+    notifyListeners();
+  }
+}
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,11 +72,42 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   File? file;
   String userImage = '';
-  String userName = 'ًWelcome';
+  String userName = 'Welcome';
   final ImagePicker _picker = ImagePicker();
+  late TextEditingController _nameController;
 
-  // pick an image
-  void pickImage() async {
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _loadUserData();
+    context.read<SettingsProvider>().loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userImage = prefs.getString('user_image') ?? '';
+      userName = prefs.getString('user_name') ?? 'Welcome';
+      _nameController.text = userName;
+    });
+  }
+
+  Future<void> _saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', userName);
+    if (userImage.isNotEmpty) {
+      await prefs.setString('user_image', userImage);
+    }
+  }
+
+  Future<void> pickImage() async {
     try {
       final pickedImage = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -35,152 +118,129 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (pickedImage != null) {
         setState(() {
           file = File(pickedImage.path);
+          userImage = pickedImage.path;
         });
+        await _saveUserData();
       }
     } catch (e) {
       log('error : $e');
     }
   }
 
-  // get user data
-  void getUserData() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // get user data fro box
-      final userBox = Boxes.getUser();
+  Future<void> _logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('user_name') ?? '';
 
-      // check is user data is not empty
-      if (userBox.isNotEmpty) {
-        final user = userBox.getAt(0);
-        setState(() {
-          userImage = user!.name;
-          userName = user.image;
-        });
+      final response = await http.post(
+        Uri.parse('http://tripwiseeeee.runasp.net/api/Auth/logout'),
+        headers: {'Content-Type': 'application/json'},
+        body: email.isNotEmpty ? jsonEncode({'email': email}) : null,
+      );
+
+      if (response.statusCode == 200) {
+        // Clear all app data
+        await prefs.clear();
+
+        // Reset settings
+        final settingsProvider = context.read<SettingsProvider>();
+        settingsProvider.reset();
+
+        // Close all Hive boxes
+        await Hive.close();
+
+        // Get the root context and navigate
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) => const WelcomeScreen(),
+          ),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logout failed: ${response.body}')),
+        );
       }
-    });
-  }
-
-  @override
-  void initState() {
-    getUserData();
-    super.initState();
+    } catch (e) {
+      log('Logout error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred during logout')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          centerTitle: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: () {
-                // save data
-              },
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 20.0,
+      appBar: AppBar(
+        title: const Text('Profile'),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Center(
-                  child: BuildDisplayImage(
-                      file: file,
-                      userImage: userImage,
-                      onPressed: () {
-                        // open camera or gallery
-                        pickImage();
-                      }),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Center(
+                child: BuildDisplayImage(
+                  file: file,
+                  userImage: userImage,
+                  onPressed: pickImage,
                 ),
-
-                const SizedBox(height: 20.0),
-
-                // user name
-                Text(userName, style: Theme.of(context).textTheme.titleLarge),
-
-                const SizedBox(height: 40.0),
-
-                ValueListenableBuilder<Box<Settings>>(
-                    valueListenable: Boxes.getSettings().listenable(),
-                    builder: (context, box, child) {
-                      if (box.isEmpty) {
-                        return Column(
-                          children: [
-                            // ai voice
-                            SettingsTile(
-                                icon: Icons.mic,
-                                title: 'Enable AI voice',
-                                value: false,
-                                onChanged: (value) {
-                                  final settingProvider =
-                                      context.read<SettingsProvider>();
-                                  settingProvider.toggleSpeak(
-                                    value: value,
-                                  );
-                                }),
-
-                            const SizedBox(height: 10.0),
-
-                            // theme
-                            SettingsTile(
-                                icon: Icons.light_mode,
-                                title: 'Theme',
-                                value: false,
-                                onChanged: (value) {
-                                  final settingProvider =
-                                      context.read<SettingsProvider>();
-                                  settingProvider.toggleDarkMode(
-                                    value: value,
-                                  );
-                                }),
-                          ],
-                        );
-                      } else {
-                        final settings = box.getAt(0);
-                        return Column(
-                          children: [
-                            // ai voice
-                            SettingsTile(
-                                icon: Icons.mic,
-                                title: 'Enable AI voice',
-                                value: settings!.shouldSpeak,
-                                onChanged: (value) {
-                                  final settingProvider =
-                                      context.read<SettingsProvider>();
-                                  settingProvider.toggleSpeak(
-                                    value: value,
-                                  );
-                                }),
-
-                            const SizedBox(height: 10.0),
-
-                            // theme
-                            SettingsTile(
-                                icon: settings.isDarkTheme
-                                    ? Icons.dark_mode
-                                    : Icons.light_mode,
-                                title: 'Theme',
-                                value: settings.isDarkTheme,
-                                onChanged: (value) {
-                                  final settingProvider =
-                                      context.read<SettingsProvider>();
-                                  settingProvider.toggleDarkMode(
-                                    value: value,
-                                  );
-                                }),
-                          ],
-                        );
-                      }
-                    })
-              ],
-            ),
+              ),
+              const SizedBox(height: 20.0),
+              TextField(
+                controller: _nameController,
+                onChanged: (value) {
+                  setState(() => userName = value);
+                  _saveUserData();
+                },
+                decoration: const InputDecoration(
+                  labelText: 'User Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 40.0),
+              ValueListenableBuilder<Box<Settings>>(
+                valueListenable: Boxes.getSettings().listenable(),
+                builder: (context, box, child) {
+                  final settingsProvider = context.read<SettingsProvider>();
+                  return Column(
+                    children: [
+                      SettingsTile(
+                        icon: Icons.mic,
+                        title: 'Enable AI voice',
+                        value: settingsProvider.shouldSpeak,
+                        onChanged: (value) {
+                          settingsProvider.toggleSpeak(value: value);
+                        },
+                      ),
+                      const SizedBox(height: 10.0),
+                      SettingsTile(
+                        icon: settingsProvider.isDarkMode
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
+                        title: 'Theme',
+                        value: settingsProvider.isDarkMode,
+                        onChanged: (value) {
+                          settingsProvider.toggleDarkMode(value: value);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

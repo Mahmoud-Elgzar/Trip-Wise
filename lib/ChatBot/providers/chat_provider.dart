@@ -201,49 +201,61 @@ class ChatProvider extends ChangeNotifier {
   }
 
   // Send message to Gemini and get the streamed response
+  // In ChatProvider, modify sendMessage():
   Future<void> sendMessage({
     required String message,
     required bool isTextOnly,
   }) async {
     try {
-      await setModel(isTextOnly: isTextOnly);
-      setLoading(value: true);
-      String chatId = getChatId();
-      List<Content> history = await getHistory(chatId: chatId);
-      final messagesBox =
-          await Hive.openBox('${Constants.chatMessagesBox}$chatId');
-      final userMessageId = messagesBox.keys.length;
-      final assistantMessageId = messagesBox.keys.length + 1;
+      // Initialize model if not done
+      if (_model == null) {
+        await setModel(isTextOnly: isTextOnly);
+      }
 
+      setLoading(value: true);
+      final chatId = getChatId();
+
+      // Add user message
       final userMessage = Message(
-        messageId: userMessageId.toString(),
+        messageId: DateTime.now().millisecondsSinceEpoch.toString(),
         chatId: chatId,
         role: Role.user,
         message: StringBuffer(message),
-        imagesUrls: getImagesUrls(isTextOnly: isTextOnly),
+        imagesUrls: [],
         timeSent: DateTime.now(),
       );
-
       _inChatMessages.add(userMessage);
       notifyListeners();
 
-      if (currentChatId.isEmpty) {
-        setCurrentChatId(newChatId: chatId);
-      }
+      // Get bot response
+      final chatSession = _model!.startChat();
+      final response = await chatSession.sendMessage(Content.text(message));
 
-      await sendMessageAndWaitForResponse(
-        message: message,
+      // Add bot response
+      final botMessage = Message(
+        messageId: DateTime.now().millisecondsSinceEpoch.toString(),
         chatId: chatId,
-        isTextOnly: isTextOnly,
-        history: history,
-        userMessage: userMessage,
-        modelMessageId: assistantMessageId.toString(),
-        messagesBox: messagesBox,
+        role: Role.assistant,
+        message: StringBuffer(response.text ?? 'No response'),
+        imagesUrls: [],
+        timeSent: DateTime.now(),
       );
-    } catch (e) {
-      log('Error sending message: $e');
-      setLoading(value: false);
+      _inChatMessages.add(botMessage);
       notifyListeners();
+    } catch (e) {
+      debugPrint('Error in sendMessage: $e');
+      // Show error to user
+      _inChatMessages.add(Message(
+        messageId: DateTime.now().millisecondsSinceEpoch.toString(),
+        chatId: getChatId(),
+        role: Role.assistant,
+        message: StringBuffer('Error: Failed to get response'),
+        imagesUrls: [],
+        timeSent: DateTime.now(),
+      ));
+      notifyListeners();
+    } finally {
+      setLoading(value: false);
     }
   }
 

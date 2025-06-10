@@ -84,7 +84,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /* appBar: AppBar(
         title: const Row(
           children: [
             CircleAvatar(
@@ -96,7 +96,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF295F98),
-      ),
+      ),*/
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -108,7 +108,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
             ],
           ),
         ),
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 22.0),
         child: Column(
           children: [
             Row(
@@ -137,32 +137,55 @@ class _TranslationScreenState extends State<TranslationScreen> {
             const SizedBox(height: 20),
             _buildTextBox('Translation',
                 TextEditingController(text: _translatedText), false),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TranslatorScreen(),
+                  ),
+                );
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 50,
+                width: 150,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xff356899), Color(0xff356899)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue[700]!.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child:const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.mic, color: Colors.white, size: 24),
+                      SizedBox(width: 8),
+                      Text(
+                        'Voice',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.chat, 'Chat'),
-              _buildBottomNavItem(Icons.history, 'History'),
-              _buildBottomNavItem(Icons.favorite_border, 'Favourite'),
-            ],
-          ),
         ),
       ),
     );
@@ -204,18 +227,12 @@ class _TranslationScreenState extends State<TranslationScreen> {
             controller: controller,
             enabled: editable,
             maxLines: null,
-            decoration: const InputDecoration.collapsed(hintText: 'Enter text'),
+            decoration: const InputDecoration.collapsed(hintText: 'Text'),
           ),
           if (!editable)
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.copy, color: Colors.grey),
-                SizedBox(width: 10),
-                Icon(Icons.share, color: Colors.grey),
-                SizedBox(width: 10),
-                Icon(Icons.star_border, color: Colors.grey),
-              ],
+              children: [],
             ),
         ],
       ),
@@ -228,42 +245,13 @@ class _TranslationScreenState extends State<TranslationScreen> {
       child: ElevatedButton(
         onPressed: _translate,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey.shade300,
+          backgroundColor: const Color(0xff356899),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        child: const Text('Translate', style: TextStyle(color: Colors.black)),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavItem(IconData icon, String label) {
-    return GestureDetector(
-      onTap: () {
-        if (label == 'Chat') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  const TranslatorScreen(), // Replace with the Chat screen if needed
-            ),
-          );
-        } else if (label == 'History') {
-          // Add History screen navigation here if needed
-        } else if (label == 'Favourite') {
-          // Add Favourite screen navigation here if needed
-        }
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.grey, size: 24),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-        ],
+        child: const Text('Translate',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }

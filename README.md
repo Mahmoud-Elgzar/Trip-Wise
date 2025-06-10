@@ -20,32 +20,40 @@ Before running the application, ensure that the environment is set up and all de
 Running the Translation Service
 To start the translation service, open a terminal and execute the following commands:
 
-Navigate to the lib directory:cd lib
+Navigate to the lib directory:
+cd lib
 
 
-Enter the translate directory:cd translate
+Enter the translate directory:
+cd translate
 
 
-Move to the backend directory:cd backend
+Move to the backend directory:
+cd backend
 
 
-Run the backend server using Uvicorn:uvicorn main:app --reload
+Run the backend server using
+Uvicorn:uvicorn main:app --reload
 
 
 
 Running the Computer Vision Service
 To start the Computer Vision service, open a terminal and execute the following commands:
 
-Navigate to the lib directory:cd lib
+Navigate to the lib directory:
+cd lib
 
 
-Enter the ComputerVision directory:cd ComputerVision
+Enter the ComputerVision directory:
+cd ComputerVision
 
 
-Move to the backend directory:cd backend
+Move to the backend directory:
+cd backend
 
 
-Run the backend script:python backend.py
+Run the backend script:
+python backend.py
 
 
 
